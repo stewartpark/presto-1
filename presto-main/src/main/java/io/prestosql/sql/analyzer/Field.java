@@ -17,6 +17,7 @@ import io.prestosql.metadata.QualifiedObjectName;
 import io.prestosql.spi.type.Type;
 import io.prestosql.sql.tree.QualifiedName;
 
+import java.util.List;
 import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
@@ -120,7 +121,27 @@ public class Field
 
     public boolean matchesPrefix(Optional<QualifiedName> prefix)
     {
-        return !prefix.isPresent() || relationAlias.isPresent() && relationAlias.get().hasSuffix(prefix.get());
+        if (!prefix.isPresent() || relationAlias.isPresent() && relationAlias.get().hasSuffix(prefix.get())) {
+            return true;
+        }
+
+        if (!originTable.isPresent()) {
+            return false;
+        }
+
+        int idx = 0;
+        boolean match = true;
+
+        QualifiedObjectName origin = originTable.get();
+        List<String> prefixes = prefix.get().getParts();
+
+        switch (prefixes.size()) {
+            case 3: match = origin.getCatalogName().equalsIgnoreCase(prefixes.get(idx++));
+            case 2: match = match && origin.getSchemaName().equalsIgnoreCase(prefixes.get(idx++));
+            case 1: match = match && origin.getObjectName().equalsIgnoreCase(prefixes.get(idx++));
+        }
+
+        return idx > 0 && match;
     }
 
     /*

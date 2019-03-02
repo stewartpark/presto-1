@@ -348,6 +348,8 @@ public final class StandardColumnMappings
             case Types.NVARCHAR:
             case Types.LONGVARCHAR:
             case Types.LONGNVARCHAR:
+            case Types.ARRAY:
+            case Types.OTHER:
                 if (columnSize > VarcharType.MAX_LENGTH) {
                     return Optional.of(varcharColumnMapping(createUnboundedVarcharType()));
                 }
