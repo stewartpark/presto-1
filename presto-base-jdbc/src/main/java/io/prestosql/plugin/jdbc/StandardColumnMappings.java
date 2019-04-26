@@ -202,7 +202,17 @@ public final class StandardColumnMappings
 
     public static ColumnMapping varcharColumnMapping(VarcharType varcharType)
     {
-        return ColumnMapping.sliceMapping(varcharType, (resultSet, columnIndex) -> utf8Slice(resultSet.getString(columnIndex)), varcharWriteFunction());
+        return ColumnMapping.sliceMapping(
+                varcharType,
+                (resultSet, columnIndex) -> {
+                    try {
+                        return utf8Slice(resultSet.getString(columnIndex));
+                    }
+                    catch (Exception e) {
+                        return null;
+                    }
+                },
+                varcharWriteFunction());
     }
 
     public static SliceWriteFunction varcharWriteFunction()
@@ -426,6 +436,8 @@ public final class StandardColumnMappings
             case Types.NVARCHAR:
             case Types.LONGVARCHAR:
             case Types.LONGNVARCHAR:
+            case Types.OTHER:
+            case Types.ARRAY:
                 if (columnSize > VarcharType.MAX_LENGTH) {
                     return Optional.of(varcharColumnMapping(createUnboundedVarcharType()));
                 }
