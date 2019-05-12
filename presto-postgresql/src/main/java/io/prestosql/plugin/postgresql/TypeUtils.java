@@ -34,6 +34,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.sql.Date;
+import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static io.airlift.slice.Slices.utf8Slice;
@@ -193,6 +194,10 @@ public final class TypeUtils
 
         if (prestoType instanceof CharType) {
             return utf8Slice(CharMatcher.is(' ').trimTrailingFrom((String) jdbcObject));
+        }
+
+        if (jdbcObject instanceof UUID) {
+            return PostgreSqlClient.uuidSlice((UUID) jdbcObject);
         }
 
         throw new PrestoException(NOT_SUPPORTED, format("Unsupported type %s and object type %s", prestoType, jdbcObject.getClass()));
