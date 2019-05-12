@@ -374,7 +374,11 @@ public class FilterStatsCalculator
             SymbolStatsEstimate leftStats = getExpressionStats(left);
             Optional<Symbol> leftSymbol = left instanceof SymbolReference ? Optional.of(Symbol.from(left)) : Optional.empty();
             if (right instanceof Literal) {
-                OptionalDouble literal = doubleValueFromLiteral(getType(left), (Literal) right);
+                Object literalValue = LiteralInterpreter.evaluate(metadata, session.toConnectorSession(), right);
+                if (literalValue == null) {
+                    return visitBooleanLiteral(BooleanLiteral.FALSE_LITERAL, null);
+                }
+                OptionalDouble literal = toStatsRepresentation(metadata, session, getType(left), literalValue);
                 return estimateExpressionToLiteralComparison(input, leftStats, leftSymbol, literal, operator);
             }
 
@@ -415,12 +419,6 @@ public class FilterStatsCalculator
                 return requireNonNull(input.getSymbolStatistics(symbol), () -> format("No statistics for symbol %s", symbol));
             }
             return scalarStatsCalculator.calculate(expression, input, session, types);
-        }
-
-        private OptionalDouble doubleValueFromLiteral(Type type, Literal literal)
-        {
-            Object literalValue = LiteralInterpreter.evaluate(metadata, session.toConnectorSession(), literal);
-            return toStatsRepresentation(metadata, session, type, literalValue);
         }
     }
 }

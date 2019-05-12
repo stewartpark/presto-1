@@ -33,6 +33,7 @@ import io.prestosql.sql.InterpretedFunctionInvoker;
 import java.util.OptionalDouble;
 
 import static java.util.Collections.singletonList;
+import static java.util.Objects.requireNonNull;
 
 final class StatsUtil
 {
@@ -45,6 +46,8 @@ final class StatsUtil
 
     static OptionalDouble toStatsRepresentation(FunctionRegistry functionRegistry, ConnectorSession session, Type type, Object value)
     {
+        requireNonNull(value, "value is null");
+
         if (convertibleToDoubleWithCast(type)) {
             InterpretedFunctionInvoker functionInvoker = new InterpretedFunctionInvoker(functionRegistry);
             Signature castSignature = functionRegistry.getCoercion(type, DoubleType.DOUBLE);
