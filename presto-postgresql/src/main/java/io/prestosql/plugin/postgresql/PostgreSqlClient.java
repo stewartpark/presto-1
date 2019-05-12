@@ -418,8 +418,9 @@ public class PostgreSqlClient
                 VarcharType.VARCHAR,
                 (resultSet, columnIndex) -> {
                     try {
-                        return utf8Slice(resultSet.getString(columnIndex))
-                    } catch(Exception e) {
+                        return utf8Slice(resultSet.getString(columnIndex));
+                    }
+                    catch (Exception e) {
                         return null;
                     }
                 },
@@ -444,7 +445,7 @@ public class PostgreSqlClient
         };
     }
 
-    private static Slice uuidSlice(UUID uuid)
+    public static Slice uuidSlice(UUID uuid)
     {
         return wrappedLongArray(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits());
     }
