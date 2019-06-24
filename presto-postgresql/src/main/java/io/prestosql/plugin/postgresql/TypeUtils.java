@@ -188,7 +188,7 @@ public final class TypeUtils
         }
 
         if (prestoType instanceof VarcharType) {
-            return utf8Slice((String) jdbcObject);
+            return utf8Slice(jdbcObject.toString());
         }
 
         if (prestoType instanceof CharType) {

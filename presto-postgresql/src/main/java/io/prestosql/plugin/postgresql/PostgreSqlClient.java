@@ -302,6 +302,9 @@ public class PostgreSqlClient
                         return arrayColumnMapping(session, prestoArrayType, elementTypeName);
                     });
         }
+        if (typeHandle.getJdbcType() == Types.OTHER) {
+            return Optional.of(typedVarcharColumnMapping(jdbcTypeName));
+        }
         // TODO support PostgreSQL's TIME WITH TIME ZONE explicitly, otherwise predicate pushdown for these types may be incorrect
         return super.toPrestoType(session, connection, typeHandle);
     }
@@ -457,7 +460,13 @@ public class PostgreSqlClient
     {
         return ColumnMapping.sliceMapping(
                 VarcharType.VARCHAR,
-                (resultSet, columnIndex) -> utf8Slice(resultSet.getString(columnIndex)),
+                (resultSet, columnIndex) -> {
+                    try {
+                        return utf8Slice(resultSet.getString(columnIndex))
+                    } catch(Exception e) {
+                        return null;
+                    }
+                },
                 typedVarcharWriteFunction(jdbcTypeName));
     }
 
