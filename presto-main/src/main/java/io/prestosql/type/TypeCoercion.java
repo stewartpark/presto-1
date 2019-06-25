@@ -44,6 +44,8 @@ import static io.prestosql.spi.type.SmallintType.SMALLINT;
 import static io.prestosql.spi.type.TimeWithTimeZoneType.TIME_WITH_TIME_ZONE;
 import static io.prestosql.spi.type.TimestampType.TIMESTAMP;
 import static io.prestosql.spi.type.TimestampWithTimeZoneType.TIMESTAMP_WITH_TIME_ZONE;
+import static io.prestosql.spi.type.VarbinaryType.VARBINARY;
+import static io.prestosql.spi.type.VarcharType.VARCHAR;
 import static io.prestosql.spi.type.VarcharType.createUnboundedVarcharType;
 import static io.prestosql.spi.type.VarcharType.createVarcharType;
 import static io.prestosql.type.CodePointsType.CODE_POINTS;
@@ -51,6 +53,7 @@ import static io.prestosql.type.JoniRegexpType.JONI_REGEXP;
 import static io.prestosql.type.JsonPathType.JSON_PATH;
 import static io.prestosql.type.LikePatternType.LIKE_PATTERN;
 import static io.prestosql.type.Re2JRegexpType.RE2J_REGEXP;
+import static io.prestosql.type.UuidType.UUID;
 import static java.util.Objects.requireNonNull;
 
 public final class TypeCoercion
@@ -423,6 +426,8 @@ public final class TypeCoercion
                         return Optional.of(JSON_PATH);
                     case CodePointsType.NAME:
                         return Optional.of(CODE_POINTS);
+                    case StandardTypes.UUID:
+                        return Optional.of(UUID);
                     default:
                         return Optional.empty();
                 }
@@ -449,6 +454,24 @@ public final class TypeCoercion
                 switch (resultTypeBase) {
                     case StandardTypes.HYPER_LOG_LOG:
                         return Optional.of(HYPER_LOG_LOG);
+                    default:
+                        return Optional.empty();
+                }
+            }
+            case StandardTypes.VARBINARY: {
+                switch (resultTypeBase) {
+                    case StandardTypes.UUID:
+                        return Optional.of(UUID);
+                    default:
+                        return Optional.empty();
+                }
+            }
+            case StandardTypes.UUID: {
+                switch (resultTypeBase) {
+                    case StandardTypes.VARBINARY:
+                        return Optional.of(VARBINARY);
+                    case StandardTypes.VARCHAR:
+                        return Optional.of(VARCHAR);
                     default:
                         return Optional.empty();
                 }
