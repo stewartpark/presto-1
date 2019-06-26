@@ -45,7 +45,6 @@ import static io.prestosql.spi.function.OperatorType.LESS_THAN;
 import static io.prestosql.spi.function.OperatorType.LESS_THAN_OR_EQUAL;
 import static io.prestosql.spi.function.OperatorType.NOT_EQUAL;
 import static io.prestosql.spi.function.OperatorType.XX_HASH_64;
-import static io.prestosql.type.UuidType.UUID;
 import static java.util.UUID.randomUUID;
 
 public final class UuidOperators
@@ -199,7 +198,9 @@ public final class UuidOperators
             if (left.isNull(leftPosition)) {
                 return false;
             }
-            return left.compareTo(leftPosition, 0, UUID.getFixedSize(), right, rightPosition, 0, UUID.getFixedSize()) != 0;
+
+            return left.getLong(leftPosition, SIZE_OF_LONG) != right.getLong(rightPosition, SIZE_OF_LONG) ||
+                left.getLong(leftPosition, 0) != right.getLong(rightPosition, 0);
         }
     }
 
